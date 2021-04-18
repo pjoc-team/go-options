@@ -125,7 +125,9 @@ func main() {
 	}
 }
 
-func writeOptionsFile(types []string, packageName string, node ast.Node, fset *token.FileSet) (found bool) {
+func writeOptionsFile(
+	types []string, packageName string, node ast.Node, fset *token.FileSet,
+) (found bool) {
 	decl, ok := node.(*ast.GenDecl)
 	if !ok || decl.Tok != token.TYPE {
 		return false
@@ -258,7 +260,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 			outputFileName = outputName
 		}
 
-		buf := bytes.NewBuffer([]byte(fmt.Sprintf("package %s\n\n", packageName)))
+		buf := bytes.NewBuffer([]byte(""))
 
 		prefix := optionInterfaceName
 		if optionPrefix != "" {
@@ -266,6 +268,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 		}
 
 		err := codeTemplate.Execute(buf, map[string]interface{}{
+			"packageName":         packageName,
 			"imports":             importList,
 			"options":             options,
 			"optionTypeName":      optionInterfaceName,
@@ -315,7 +318,7 @@ func parseStructTag(field *ast.Field) (publicName string, defaultValue string, s
 			}
 		}
 	}
-	SkipTag:
+SkipTag:
 	return publicName, formatDefault(field.Type, defaultValue), false
 }
 
