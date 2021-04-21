@@ -6,7 +6,7 @@ import (
 	time2 "time"
 )
 
-//go:generate go-options -imports=time,net/url,time2=time config
+//go:generate go run github.com/pjoc-team/go-options -imports=time,net/url,time2=time config
 type config struct {
 	myInt            int
 	myIntWithDefault int `options:",1"`

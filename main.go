@@ -282,13 +282,14 @@ func writeOptionsFile(
 		if err != nil {
 			log.Fatal(fmt.Errorf("template execute failed: %s", err))
 		}
+
 		if err := ioutil.WriteFile(outputFileName, buf.Bytes(), 0644); err != nil {
 			log.Fatal(fmt.Errorf("write failed: %s", err))
 		}
 		cmd := exec.Command("gofmt", "-w", outputFileName)
 		cmd.Stderr = os.Stderr
 		if err := cmd.Run(); err != nil {
-			log.Fatal(fmt.Errorf("gofmt failed: %s", err))
+			log.Fatal(fmt.Errorf("gofmt failed: %s", err.Error()))
 		}
 	}
 

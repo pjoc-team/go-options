@@ -1,4 +1,4 @@
-module github.com/launchdarkly/go-options
+module github.com/pjoc-team/go-options
 
 require (
 	github.com/fatih/structtag v1.0.0
