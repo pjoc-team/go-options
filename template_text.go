@@ -6,6 +6,7 @@ const codeTemplateText = `
 
 package {{$.packageName}}
 
+
 {{ if .imports -}}
 import (
 {{- range .imports }}
@@ -16,6 +17,7 @@ import (
 
 {{ $applyOptionFuncType := or $.applyOptionFuncType (printf "Apply%sFunc" (ToTitle $.optionTypeName)) }}
 
+// {{ $applyOptionFuncType }} the func of {{ $.configTypeName }}
 type {{ $applyOptionFuncType }} func(c *{{ $.configTypeName }}) error
 
 func (f {{ $applyOptionFuncType }}) apply(c *{{ $.configTypeName }}) error {
@@ -47,6 +49,7 @@ return err
 return nil
 }
 
+// {{ $.optionTypeName }} interface {{ $.optionTypeName }}
 type {{ $.optionTypeName }} interface {
 apply(*{{ $.configTypeName }}) error
 }
@@ -57,6 +60,7 @@ apply(*{{ $.configTypeName }}) error
 {{ if .Docs }}
 {{- range $i, $doc := .Docs }}// {{ if eq $i 0 }}{{ $name }} {{ end }}{{ $doc }}{{ end -}}
 {{ end -}}
+// {{ $name }} option func
 func {{ $name }}(
 {{- range $i, $f := .Fields }}{{ if ne $i 0 }},{{ end }}{{ $f.ParamName }} {{ $f.Type }}{{ end -}}
 ) {{ $applyOptionFuncType }} {

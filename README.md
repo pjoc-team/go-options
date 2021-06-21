@@ -56,7 +56,7 @@ would generate code that looks like this:
 ```go
 // OptionHowMany indicates the number of items
 // no more than ten
-func OptionHowMany(o int) applyOptionFunc {
+func ApplyHowMany(o int) applyOptionFunc {
     // ...
 }
 ```
@@ -75,7 +75,7 @@ type config struct {
 would yield:
 
 ```go
-func OptionNumber(a int, b int) applyOptionFunc {
+func ApplyNumber(a int, b int) applyOptionFunc {
     // ...
 }
 ```
@@ -92,11 +92,11 @@ type config struct {
 would yield:
 
 ```
-func OptionNumbers(numbers ...int) applyOptionFunc {
+func ApplyNumbers(numbers ...int) applyOptionFunc {
     // ...
 }
 
-func OptionInts(nums ...int) applyOptionFunc {
+func ApplyInts(nums ...int) applyOptionFunc {
     // ...
 }
 ```
@@ -114,11 +114,11 @@ type config struct {
 would yield:
 
 ```
-func OptionValue(o ...int) applyOptionFunc {
+func ApplyValue(o ...int) applyOptionFunc {
     // ...
 }
 
-func OptionMyValue(o ...int) applyOptionFunc {
+func ApplyMyValue(o ...int) applyOptionFunc {
     // ...
 }
 ```

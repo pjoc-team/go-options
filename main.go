@@ -30,6 +30,7 @@ var optionSuffix string
 var imports string
 var quoteStrings bool
 
+// Usage usage func
 var Usage = func() {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s <type>:\n\n", os.Args[0])
 	fmt.Fprintf(flag.CommandLine.Output(), "  %s [<option> ... ] <config type> ...\n\n", os.Args[0])
@@ -40,7 +41,7 @@ var Usage = func() {
 func initFlags() {
 	flag.StringVar(&typeName, "type", "", "name of struct to create options for")
 	flag.BoolVar(&createNewFunc, "new", true, "whether to create a function to return a new config")
-	flag.StringVar(&optionInterfaceName, "option", "Option", "name of the interface to use for options")
+	flag.StringVar(&optionInterfaceName, "option", "Apply", "name of the interface to use for options")
 	flag.StringVar(&imports, "imports", "", "a comma-separated list of packages with optional alias (e.g. time,url=net/url) ")
 	flag.StringVar(&outputName, "output", "", "name of output file (default is <type>_options.go)")
 	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
@@ -53,6 +54,7 @@ func initFlags() {
 	flag.Usage = Usage
 }
 
+// Field fields
 type Field struct {
 	Name         string
 	ParamName    string
@@ -60,6 +62,7 @@ type Field struct {
 	DefaultValue string
 }
 
+// Option option
 type Option struct {
 	Name         string
 	PublicName   string
@@ -71,6 +74,7 @@ type Option struct {
 	Type         string
 }
 
+// Import imports
 type Import struct {
 	Alias string
 	Path  string
