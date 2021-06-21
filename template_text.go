@@ -15,7 +15,7 @@ import (
 )
 {{ end }}
 
-{{ $applyOptionFuncType := or $.applyOptionFuncType (printf "Apply%sFunc" (ToTitle $.optionTypeName)) }}
+{{ $applyOptionFuncType := or $.applyOptionFuncType (printf "%sFunc" (ToTitle $.optionTypeName)) }}
 
 // {{ $applyOptionFuncType }} the func of {{ $.configTypeName }}
 type {{ $applyOptionFuncType }} func(c *{{ $.configTypeName }}) error

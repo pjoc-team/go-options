@@ -2,10 +2,10 @@
 
 package examples
 
-// ApplyApplyFunc the func of eoptions
-type ApplyApplyFunc func(c *eoptions) error
+// ApplyFunc the func of eoptions
+type ApplyFunc func(c *eoptions) error
 
-func (f ApplyApplyFunc) apply(c *eoptions) error {
+func (f ApplyFunc) apply(c *eoptions) error {
 	return f(c)
 }
 
@@ -30,7 +30,7 @@ type Apply interface {
 }
 
 // ApplyName option func
-func ApplyName(o string) ApplyApplyFunc {
+func ApplyName(o string) ApplyFunc {
 	return func(c *eoptions) error {
 		c.Name = o
 		return nil
