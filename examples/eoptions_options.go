@@ -2,20 +2,20 @@
 
 package examples
 
-// ApplyWithFunc the func of eoptions
-type ApplyWithFunc func(c *eoptions) error
+// ApplyOptionFunc the func of eoptions
+type ApplyOptionFunc func(c *eoptions) error
 
-func (f ApplyWithFunc) apply(c *eoptions) error {
+func (f ApplyOptionFunc) apply(c *eoptions) error {
 	return f(c)
 }
 
-func newEoptions(options ...With) (eoptions, error) {
+func newEoptions(options ...Option) (eoptions, error) {
 	var c eoptions
 	err := applyEoptionsOptions(&c, options...)
 	return c, err
 }
 
-func applyEoptionsOptions(c *eoptions, options ...With) error {
+func applyEoptionsOptions(c *eoptions, options ...Option) error {
 	for _, o := range options {
 		if err := o.apply(c); err != nil {
 			return err
@@ -24,13 +24,13 @@ func applyEoptionsOptions(c *eoptions, options ...With) error {
 	return nil
 }
 
-// With interface With
-type With interface {
+// Option interface Option
+type Option interface {
 	apply(*eoptions) error
 }
 
 // WithName option func
-func WithName(o string) ApplyWithFunc {
+func WithName(o string) ApplyOptionFunc {
 	return func(c *eoptions) error {
 		c.Name = o
 		return nil
