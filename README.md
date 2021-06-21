@@ -5,7 +5,7 @@
 The LaunchDarkly Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax.  You write this:
 
 ```go
-//go:generate go-options config
+//go:generate go run github.com/pjoc-team/go-options config
 type config struct {
 	howMany int
 }
@@ -33,7 +33,7 @@ func NewCollection(options... Option) (Foo, err) {
 You can also specify default values and override the option name as follows:
 
 ```go
-//go:generate go-options config
+//go:generate go run github.com/pjoc-team/go-options config
 type config struct {
 	howMany int `options:"number,5"
 }
@@ -44,7 +44,7 @@ This would create `OptionNumber` with a default value of 5.  Entering the the ta
 You can also specify documentation using docstrings or line strings, so:
 
 ```go
-//go:generate go-options config
+//go:generate go run github.com/pjoc-team/go-options config
 type config struct {
     // indicates the number of items
     howMany int // no more than 10
