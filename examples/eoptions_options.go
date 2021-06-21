@@ -9,9 +9,9 @@ func (f ApplyOptionFunc) apply(c *eoptions) error {
 	return f(c)
 }
 
-func newEoptions(options ...Option) (eoptions, error) {
+func newEoptions(opts ...Option) (eoptions, error) {
 	var c eoptions
-	err := applyEoptionsOptions(&c, options...)
+	err := applyEoptionsOptions(&c, opts...)
 	return c, err
 }
 
