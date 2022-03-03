@@ -42,14 +42,29 @@ func initFlags() {
 	flag.StringVar(&typeName, "type", "", "name of struct to create options for")
 	flag.BoolVar(&createNewFunc, "new", true, "whether to create a function to return a new config")
 	flag.StringVar(&optionInterfaceName, "option", "Option", "name of the interface to use for options")
-	flag.StringVar(&imports, "imports", "", "a comma-separated list of packages with optional alias (e.g. time,url=net/url) ")
+	flag.StringVar(
+		&imports, "imports", "", "a comma-separated list of packages with optional alias (e.g. time,url=net/url) ",
+	)
 	flag.StringVar(&outputName, "output", "", "name of output file (default is <type>_options.go)")
-	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
-	flag.StringVar(&applyOptionFunctionType, "option_func", "",
-		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`)
-	flag.StringVar(&optionPrefix, "prefix", "With", `name of prefix to use for options (default is the same as "option")`)
-	flag.StringVar(&optionSuffix, "suffix", "", `name of suffix to use for options (forces use of suffix, cannot with used with prefix)`)
-	flag.BoolVar(&quoteStrings, "quote-default-strings", true, `set to false to disable automatic quoting of string field defaults`)
+	flag.StringVar(
+		&applyFunctionName, "func", "",
+		`name of function created to apply options to <type> (default is "apply<Type>Options")`,
+	)
+	flag.StringVar(
+		&applyOptionFunctionType, "option_func", "",
+		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`,
+	)
+	flag.StringVar(
+		&optionPrefix, "prefix", "With", `name of prefix to use for options (default is the same as "option")`,
+	)
+	flag.StringVar(
+		&optionSuffix, "suffix", "",
+		`name of suffix to use for options (forces use of suffix, cannot with used with prefix)`,
+	)
+	flag.BoolVar(
+		&quoteStrings, "quote-default-strings", true,
+		`set to false to disable automatic quoting of string field defaults`,
+	)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 	flag.Usage = Usage
 }
@@ -106,7 +121,7 @@ func main() {
 
 	pkgs, err := packages.Load(cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("packages.Load failed, err: %v", err.Error())
 	}
 
 	if len(pkgs) != 1 {
@@ -115,18 +130,39 @@ func main() {
 
 	success := false
 	for _, file := range pkgs[0].Syntax {
-		ast.Inspect(file, func(node ast.Node) bool {
-			found := writeOptionsFile(types, pkgs[0].Name, node, pkgs[0].Fset)
-			if found {
-				success = true
-			}
-			return !found
-		})
+		ast.Inspect(
+			file, func(node ast.Node) bool {
+				found := writeOptionsFile(types, pkgs[0].Name, node, pkgs[0].Fset)
+				if found {
+					success = true
+				}
+				return !found
+			},
+		)
 	}
 
 	if !success {
 		log.Fatalf(`unable to find type "%s"`, typeName)
 	}
+}
+
+func parseImports(node ast.Node) []Import {
+	decl, ok := node.(*ast.GenDecl)
+	if !ok || decl.Tok != token.TYPE {
+		return nil
+	}
+	imports := make([]Import, 0)
+	for _, spec := range decl.Specs {
+		importSpec, ok := spec.(*ast.ImportSpec)
+		if !ok {
+			continue
+		}
+		impt := Import{}
+		impt.Alias = importSpec.Name.Name
+		impt.Path = importSpec.Path.Value
+		imports = append(imports, impt)
+	}
+	return imports
 }
 
 func writeOptionsFile(
@@ -209,12 +245,14 @@ func writeOptionsFile(
 						}
 					}
 					for _, n := range sfield.Names {
-						fields = append(fields, Field{
-							Name:         n.Name,
-							ParamName:    stringsOr(paramName, n.Name),
-							Type:         typeStr,
-							DefaultValue: defaultValue,
-						})
+						fields = append(
+							fields, Field{
+								Name:         n.Name,
+								ParamName:    stringsOr(paramName, n.Name),
+								Type:         typeStr,
+								DefaultValue: defaultValue,
+							},
+						)
 					}
 				}
 			case *ast.ArrayType:
@@ -232,32 +270,22 @@ func writeOptionsFile(
 			}
 
 			for _, n := range field.Names {
-				options = append(options, Option{
-					Name:         n.Name,
-					PublicName:   stringsOr(publicName, n.Name),
-					DefaultValue: defaultValue,
-					Fields:       fields,
-					Docs:         docs,
-					DefaultIsNil: defaultIsNil,
-					IsStruct:     isStruct,
-					Type:         typeStr,
-				})
+				options = append(
+					options, Option{
+						Name:         n.Name,
+						PublicName:   stringsOr(publicName, n.Name),
+						DefaultValue: defaultValue,
+						Fields:       fields,
+						Docs:         docs,
+						DefaultIsNil: defaultIsNil,
+						IsStruct:     isStruct,
+						Type:         typeStr,
+					},
+				)
 			}
 		}
 
-		var importList []Import
-		if imports != "" {
-			for _, s := range strings.Split(imports, ",") {
-				parts := strings.Split(s, "=")
-				if len(parts) == 1 {
-					importList = append(importList, Import{Path: parts[0]})
-				} else if len(parts) == 2 {
-					importList = append(importList, Import{Alias: parts[0], Path: parts[1]})
-				} else {
-					log.Fatalf(`ERROR: unexpected import description "%s"`, s)
-				}
-			}
-		}
+		importList := parseImports(node)
 
 		outputFileName := fmt.Sprintf("%s_options.go", typeSpec.Name)
 		if outputName != "" {
@@ -271,18 +299,20 @@ func writeOptionsFile(
 			prefix = optionPrefix
 		}
 
-		err := codeTemplate.Execute(buf, map[string]interface{}{
-			"packageName":         packageName,
-			"imports":             importList,
-			"options":             options,
-			"optionTypeName":      optionInterfaceName,
-			"configTypeName":      typeName,
-			"optionPrefix":        prefix,
-			"optionSuffix":        optionSuffix,
-			"applyFuncName":       applyFunctionName,
-			"applyOptionFuncName": applyOptionFunctionType,
-			"createNewFunc":       createNewFunc,
-		})
+		err := codeTemplate.Execute(
+			buf, map[string]interface{}{
+				"packageName":         packageName,
+				"imports":             importList,
+				"options":             options,
+				"optionTypeName":      optionInterfaceName,
+				"configTypeName":      typeName,
+				"optionPrefix":        prefix,
+				"optionSuffix":        optionSuffix,
+				"applyFuncName":       applyFunctionName,
+				"applyOptionFuncName": applyOptionFunctionType,
+				"createNewFunc":       createNewFunc,
+			},
+		)
 		if err != nil {
 			log.Fatal(fmt.Errorf("template execute failed: %s", err))
 		}
