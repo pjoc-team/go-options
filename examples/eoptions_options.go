@@ -9,6 +9,13 @@ func (f ApplyOptionFunc) apply(c *eoptions) error {
 	return f(c)
 }
 
+// NewEoptions create Eoptions with options
+func NewEoptions(opts ...Option) (eoptions, error) {
+	var c eoptions
+	err := applyEoptionsOptions(&c, opts...)
+	return c, err
+}
+
 func newEoptions(opts ...Option) (eoptions, error) {
 	var c eoptions
 	err := applyEoptionsOptions(&c, opts...)

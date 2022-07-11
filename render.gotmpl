@@ -23,6 +23,15 @@ return f(c)
 {{ $applyFuncName := or $.applyFuncName (printf "apply%sOptions" (ToTitle $.configTypeName)) }}
 
 {{ if $.createNewFunc}}
+// New{{ $.configTypeName | ToTitle}} create {{ $.configTypeName | ToTitle}} with options
+func New{{ $.configTypeName | ToTitle}}(opts ...{{ $.optionTypeName }}) ({{ $.configTypeName }}, error) {
+var c {{ $.configTypeName }}
+err := {{ $applyFuncName }}(&c, opts...)
+return c, err
+}
+{{ end }}
+
+{{ if $.createNewFunc}}
 func new{{ $.configTypeName | ToTitle}}(opts ...{{ $.optionTypeName }}) ({{ $.configTypeName }}, error) {
 var c {{ $.configTypeName }}
 err := {{ $applyFuncName }}(&c, opts...)
