@@ -43,3 +43,11 @@ func WithName(o string) ApplyOptionFunc {
 		return nil
 	}
 }
+
+// WithFilterFunc option func
+func WithFilterFunc(o FilterFunc[T]) ApplyOptionFunc {
+	return func(c *eoptions) error {
+		c.FilterFunc = o
+		return nil
+	}
+}

@@ -162,8 +162,33 @@ func writeOptionsFile(
 		}
 
 		var typeName string
+		var genericNames []string
+		var genericTypes []string
 		for _, n := range types {
 			if typeSpec.Name.String() == n {
+				// typeNameBuilder := &strings.Builder{}
+				// typeNameBuilder.WriteString(n)
+
+				if typeSpec != nil && typeSpec.TypeParams != nil && len(typeSpec.TypeParams.List) > 0 {
+					// typeNameBuilder.WriteString("[")
+
+					// genericDelimiter := ""
+					for _, field := range typeSpec.TypeParams.List {
+						// typeNameBuilder.WriteString(genericDelimiter)
+						for _, name := range field.Names {
+							genericNames = append(genericNames, name.Name)
+							// typeNameBuilder.WriteString(name.Name)
+							// typeNameBuilder.WriteString(" ")
+						}
+						if id, ok := field.Type.(*ast.Ident); ok {
+							genericTypes = append(genericTypes, id.Name)
+							// typeNameBuilder.WriteString(id.Name)
+						}
+						// genericDelimiter = ", "
+					}
+					// typeNameBuilder.WriteString("]")
+				}
+
 				typeName = n
 				break
 			}
@@ -304,6 +329,8 @@ func writeOptionsFile(
 				"applyFuncName":       applyFunctionName,
 				"applyOptionFuncName": applyOptionFunctionType,
 				"createNewFunc":       createNewFunc,
+				"genericTypes":        genericTypes,
+				"genericNames":        genericNames,
 			},
 		)
 		if err != nil {
