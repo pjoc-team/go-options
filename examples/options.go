@@ -1,9 +1,9 @@
 package examples
 
-//go:generate go run ../ -type eoptions
-type eoptions[T any] struct {
+//go:generate go run ../ -type eoptions -option EOption
+type eoptions struct {
 	Name       string
-	FilterFunc FilterFunc[T]
+	FilterFunc FilterFunc
 }
 
-type FilterFunc[T any] func(t T) bool
+type FilterFunc func(t interface{}) bool

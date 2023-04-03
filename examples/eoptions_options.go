@@ -2,27 +2,27 @@
 
 package examples
 
-// ApplyOptionFunc the func of eoptions
-type ApplyOptionFunc func(c *eoptions) error
+// ApplyEOptionFunc the func of eoptions
+type ApplyEOptionFunc func(c *eoptions) error
 
-func (f ApplyOptionFunc) apply(c *eoptions) error {
+func (f ApplyEOptionFunc) apply(c *eoptions) error {
 	return f(c)
 }
 
 // NewEoptions create Eoptions with options
-func NewEoptions(opts ...Option) (eoptions, error) {
+func NewEoptions(opts ...EOption) (eoptions, error) {
 	var c eoptions
 	err := applyEoptionsOptions(&c, opts...)
 	return c, err
 }
 
-func newEoptions(opts ...Option) (eoptions, error) {
+func newEoptions(opts ...EOption) (eoptions, error) {
 	var c eoptions
 	err := applyEoptionsOptions(&c, opts...)
 	return c, err
 }
 
-func applyEoptionsOptions(c *eoptions, options ...Option) error {
+func applyEoptionsOptions(c *eoptions, options ...EOption) error {
 	for _, o := range options {
 		if err := o.apply(c); err != nil {
 			return err
@@ -31,13 +31,13 @@ func applyEoptionsOptions(c *eoptions, options ...Option) error {
 	return nil
 }
 
-// Option interface Option
-type Option interface {
+// EOption interface EOption
+type EOption interface {
 	apply(*eoptions) error
 }
 
 // WithName option func
-func WithName(o string) ApplyOptionFunc {
+func WithName(o string) ApplyEOptionFunc {
 	return func(c *eoptions) error {
 		c.Name = o
 		return nil
@@ -45,7 +45,7 @@ func WithName(o string) ApplyOptionFunc {
 }
 
 // WithFilterFunc option func
-func WithFilterFunc(o FilterFunc[T]) ApplyOptionFunc {
+func WithFilterFunc(o FilterFunc) ApplyEOptionFunc {
 	return func(c *eoptions) error {
 		c.FilterFunc = o
 		return nil
